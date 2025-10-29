@@ -1,0 +1,129 @@
+name: Build and Deploy webrtc-js with gitea actions
+on:
+ push:
+  branches:
+  - develop
+  tags:
+   - '[A-Za-z0-9]+.[A-Za-z0-9]+.[A-Za-z0-9]+'
+jobs:
+  webrtc-js:
+    runs-on: debian-12
+    container:
+      image: "gitring.com/ds/debian-12-builder:v1"
+      credentials: 
+        username: ${{ github.actor }}
+        password: ${{ secrets.BUILDER_TOKEN }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      RELOAD_USER: ${{ secrets.RELOAD_USER }}
+    steps:
+      - name: Check out current repository
+        uses: actions/checkout@v4
+      - name: List my path
+        run: ls -lh `pwd`
+      - name: Set environment       
+        run: |                    
+          PATTERN="*[[:alnum:]]*.[0-9]*.[0-9]*"
+          TMP="${GITHUB_REF_NAME}"
+          case $TMP in
+            $PATTERN)
+              echo "Tag je pusten $TMP"
+              ENV_NAME="prod"
+            ;;
+            master|release)
+              echo "Stage je pusten"
+              ENV_NAME="stage"
+            ;;
+            develop)
+              echo "Develop je pusten"
+              ENV_NAME="dev"
+            ;;
+            *)
+              echo "Invalid environment: $TMP"
+              exit 1;
+            ;;
+          esac
+          echo "Setovan je env - $ENV_NAME"
+          echo "ENV_NAME=${ENV_NAME}" >> "$GITHUB_ENV"
+      - name: Building server
+        run: |           
+          export HOME=/root
+          echo "https://dsar:"${{ secrets.DSAR_PASS }}"@gitring.com" > $HOME/.git-credentials
+          if [ -f .env ]; then
+           echo ".env file exists, continue"
+          else
+           echo ".env file not found!"
+           exit 1
+          fi
+          npm i
+          rm -f $HOME/.git-credentials 
+          echo "Buling server is completed"
+      - name: Building client
+        run: |           
+          export HOME=/root
+          echo "https://dsar:"${{ secrets.DSAR_PASS }}"@gitring.com" > $HOME/.git-credentials
+          cd ./reactClient/
+          ls -lh
+          if [ -f .env ]; then
+           echo ".env file exists, continue"
+          else
+           echo ".env file not found!"
+           exit 1
+          fi
+          if [ "${ENV_NAME}" == 'prod' ]; then
+           rpl -F "VITE_APP_BACKEND_SERVER=https://webrtc.hoodengage.com" "VITE_APP_BACKEND_SERVER=https://api.empowernation.com" .env
+           rpl -F "VITE_APP_DAILY_PROXY=https://webrtc.hoodengage.com" "VITE_APP_DAILY_PROXY=https://api.empowernation.com" .env
+           rpl "dev.app.empowernation.com.key" "app.empowernation.com.key" ./vite.config.js
+           rpl "dev.app.empowernation.com.cert" "app.empowernation.com.cert" ./vite.config.js
+           touch app.empowernation.com.key app.empowernation.com.cert
+           ls -lh
+          fi
+          if [ "${ENV_NAME}" == 'dev' ]; then
+           touch dev.app.empowernation.com.key dev.app.empowernation.com.cert
+           ls -lh
+          fi
+          npm i
+          npm run build --loglevel verbose
+          echo "Bulding client is completed"
+          rm -f $HOME/.git-credentials
+      - name: Deploy
+        run: | 
+          echo "Deploying to $ENV_NAME"
+          eval $(ssh-agent)
+          trap "ssh-agent -k" exit          
+          echo "${{secrets.SSH_DSD_KEY}}" | tr -d '\r' | ssh-add -
+          DEPLOY_SERVERS="$(curl -s -k -H "Authorization: Bearer ${{secrets.HIVE_TOKEN}}" "https://hive.delsystems.net/api/v1/hive/bees?env=${ENV_NAME}&tag=dermassure&page=all"| jq -r '.items[]? | .ip?')"
+          echo "$DEPLOY_SERVERS"
+          rsync -avz -e 'ssh -o StrictHostKeyChecking=no' --exclude='.gitea' --exclude='.env' --exclude='.gitignore' --exclude='.git' --exclude='dev.app.empowernation.com.key' --exclude='dev.app.empowernation.com.cert' --exclude='app.empowernation.com.cert' --exclude='app.empowernation.com.key' ./ dsd@"${DEPLOY_SERVERS}":/chroot/empowernation/
+          echo "Deploy to $ENV_NAME is done"
+      - name: Run prisma generate/migrate
+        run: |
+          eval $(ssh-agent)
+          trap "ssh-agent -k" exit          
+          echo "${{secrets.SSH_RELOAD_USER}}" | tr -d '\r' | ssh-add -
+          DEPLOY_SERVERS="$(curl -s -k -H "Authorization: Bearer ${{secrets.HIVE_TOKEN}}" "https://hive.delsystems.net/api/v1/hive/bees?env=${ENV_NAME}&tag=dermassure&page=all"| jq -r '.items[]? | .ip?')"
+          echo "$DEPLOY_SERVERS"
+          ssh -tt "${RELOAD_USER}"@"${DEPLOY_SERVERS}" -o StrictHostKeyChecking=no -- "bash -c 'cd /chroot/empowernation/ && /usr/bin/sudo /usr/bin/npx prisma generate && /usr/bin/sudo /usr/bin/npx prisma migrate deploy'"
+      - name: Restart services after deployment
+        run: | 
+          echo "Restart service remotely on $ENV_NAME"
+          eval $(ssh-agent)
+          trap "ssh-agent -k" exit          
+          echo "${{secrets.SSH_RELOAD_USER}}" | tr -d '\r' | ssh-add -
+          DEPLOY_SERVERS="$(curl -s -k -H "Authorization: Bearer ${{secrets.HIVE_TOKEN}}" "https://hive.delsystems.net/api/v1/hive/bees?env=${ENV_NAME}&tag=dermassure&page=all"| jq -r '.items[]? | .ip?')"
+          echo "$DEPLOY_SERVERS"
+          ssh -tt "${RELOAD_USER}"@"${DEPLOY_SERVERS}" -o StrictHostKeyChecking=no -- "bash -c '/usr/bin/sudo /usr/bin/systemctl restart empowernation-server.service && /usr/bin/sudo /usr/bin/systemctl restart empowernation-client.service'"
+          echo "Restart done"
+          
+      #- name: Notify Slack Action
+      #  uses: ravsamhq/notify-slack-action@2.3.0
+      #  if:  always()
+      #  with:
+      #    status: ${{ job.status }}
+      #    notification_title: "Gitea Action {status_message} for ${{ github.event.repository.name }} - ${{ github.ref_name }}"
+      #    message_format: "Gitea Actions - ${{ github.event.repository.name }}/{commit_sha}"
+      #    footer: "Workflow URL: ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}/actions/runs/${{ env.GITHUB_RUN_NUMBER }}"
+        

@@ -1,0 +1,60 @@
+.home-screen {
+  padding: 0 1rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+  justify-content: center;
+  text-align: center;
+  background: #d5cfc7;
+  width: 100%;
+  height: 100dvh;
+}
+
+.home-screen h1 {
+  color: var(--white);
+  font-weight: bold;
+}
+
+.home-screen p {
+  color: var(--grey);
+}
+.button:hover {
+  border: 1px solid gray;
+}
+.button {
+  transition: 0.3s;
+  color: #f7f7fc;
+  text-align: center;
+
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 600;
+  // line-height: 34.766px;
+  // border-radius: 37.249px;
+  background: #49627d;
+  padding: 0.5rem 2rem;
+  border: 1px solid transparent;
+  margin-left: 0px;
+
+  &.hollow {
+    border: 1px solid #49627d;
+    border-radius: 35px;
+    background: white;
+    color: #49627d;
+    width: 100%;
+    max-width: 345px;
+    &:hover {
+      text-shadow: none;
+    }
+  }
+}
+#joinSecondStep {
+  .button {
+    width: 70%;
+  }
+}
+.mt1 {
+  margin-top: 1rem !important;
+}

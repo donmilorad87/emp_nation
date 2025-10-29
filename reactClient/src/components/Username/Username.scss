@@ -1,0 +1,53 @@
+.username {
+  position: absolute;
+  z-index: 2;
+  color: var(--grey);
+  background-color: rgba(0, 0, 0, 0.6);
+  bottom: 0;
+  left: 0;
+  font-size: 14px;
+  padding: 6px 8px;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  border-radius: 50px;
+  text-transform: capitalize;
+  font-weight: 600;
+  text-shadow: 0 0 5px BLACK;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  svg {
+    width: 24px;
+  }
+}
+@media (max-width: 1024px) {
+  .self-view {
+    .username {
+      width: calc(100% - 1.5rem);
+      font-size: 12px;
+    }
+  }
+}
+@media (min-width: 0px) {
+  .tile-video:not(.self-view) {
+    .username {
+      bottom: 7rem;
+    }
+  }
+}
+@media (min-width: 768px) {
+  .tile-video:not(.self-view) {
+    .username {
+      bottom: 0.75rem;
+    }
+  }
+}
+.iconContainers {
+  justify-content: space-between;
+}
+.muteAudioIcon,
+.muteVideoIcon {
+  display: flex;
+}

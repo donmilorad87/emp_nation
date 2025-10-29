@@ -1,0 +1,125 @@
+.callFrame {
+  &.withParticipants {
+    display: flex;
+    align-items: center;
+  }
+  .tray {
+    button {
+      svg {
+        width: 24px;
+      }
+    }
+  }
+}
+.tile-video {
+  position: relative;
+  transition: 0.3s;
+  height: auto;
+
+  border-radius: 0.5rem;
+  video {
+    object-fit: cover !important;
+    transform: scale(-1, 1);
+    height: 100%;
+    background: transparent;
+  }
+}
+
+.withParticipants {
+  .tile-video {
+    position: relative;
+    transition: 0.3s;
+
+    video {
+      object-fit: cover !important;
+      transform: scale(-1, 1);
+      height: 100%;
+      background: transparent;
+    }
+    &.provider {
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      width: 159px;
+      height: auto;
+      border-radius: 0.5rem;
+      z-index: 99;
+      background-color: transparent;
+      video {
+        height: 159px;
+        object-fit: cover;
+      }
+    }
+    &.client {
+      left: 0rem;
+      top: 0rem;
+      width: auto;
+
+      /*       @media (max-width:1024px){
+        height: 100%;
+      } */
+      width: -webkit-fill-available;
+      border-radius: 0.5rem;
+      &.top_header:not(.switchBorrower) {
+        padding-top: 1rem;
+        height: 100%;
+      }
+
+      video {
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+}
+@media only screen and (max-width: 600px) {
+  .tile-video {
+    width: 100%;
+    height: 50%;
+  }
+}
+.tile-video {
+  height: 100%;
+  background: transparent;
+}
+.self-view {
+  position: relative;
+}
+
+@media only screen and (max-width: 600px) {
+  .self-view {
+    width: 100%;
+    height: 50%;
+  }
+}
+
+.no-video {
+  background-color: #111111;
+}
+
+.no-video video {
+  visibility: hidden;
+}
+
+/* Hard-code the self-view size if there's no one else in the call, just to make it align with the info-box */
+.self-view.alone {
+  width: auto;
+  height: 270px;
+}
+.self-view {
+  &.top_header {
+    padding-top: 1rem;
+  }
+}
+@media only screen and (max-width: 600px) {
+  .self-view.alone {
+    width: 240px;
+    height: 135px;
+  }
+}
+
+/* Put screen share front and center in our grid when there is one active */
+.tile-screenshare {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}

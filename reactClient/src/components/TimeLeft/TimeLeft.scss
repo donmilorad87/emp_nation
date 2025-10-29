@@ -1,0 +1,101 @@
+.timeLeft {
+  display: flex;
+  transition: 0.3s;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  border-radius: 5px;
+  padding: 8px 12px;
+  color: white;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  z-index: 199;
+  font-family: "Courier New", Courier, monospace;
+  font-weight: 600;
+
+  cursor: help;
+  &:hover {
+    width: auto;
+    .billable {
+      opacity: 1;
+      scale: 1;
+      padding-top: 0.5rem;
+      height: 32px;
+      width: 100%;
+    }
+  }
+  .timeLeftInner {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-left: auto;
+  }
+  .billable {
+    transition: 0.3s;
+    opacity: 0;
+    scale: 0;
+    padding: 0;
+    height: 0;
+    width: 0;
+    overflow: hidden;
+  }
+  &.dn {
+    display: none;
+  }
+  &.gray {
+    background: rgba(0, 0, 0, 0.5);
+    &:hover {
+      background: rgba(0, 0, 0, 0.75);
+    }
+  }
+  &.lightBlue {
+    background: rgba(50, 173, 230, 0.5);
+    &:hover {
+      background: rgba(50, 173, 230, 0.75);
+    }
+  }
+  &.orange {
+    background: rgba(255, 149, 0, 0.5);
+    &:hover {
+      background: rgba(255, 149, 0, 0.75);
+    }
+  }
+  &.green {
+    background: rgba(52, 188, 89, 0.5);
+    &:hover {
+      background: rgba(52, 188, 89, 0.75);
+    }
+  }
+}
+
+.clockDiv {
+  display: flex;
+  width: 102px;
+  justify-content: space-between;
+  align-items: center;
+  .timeLeftText {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    top: 1px;
+    .colon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      width: 5px;
+    }
+    .hours,
+    .minutes,
+    .seconds {
+      display: flex;
+      width: 22px;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

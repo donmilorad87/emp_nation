@@ -1,0 +1,24 @@
+.activateForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 320px;
+  max-width: 320px;
+  text-align: center;
+  h2 {
+    text-align: center;
+  }
+  .form-group {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+    .formDiv {
+      display: flex;
+      gap: 1rem;
+      input {
+        margin-left: auto;
+        width: 100%;
+      }
+    }
+  }
+}

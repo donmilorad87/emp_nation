@@ -1,0 +1,16 @@
+.backgroundImages {
+  .imageDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    img {
+      height: auto;
+      width: 100%;
+      &.noImage {
+        height: 20px;
+        width: 20px;
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+.home-layout {
+  background: #f1f1f1;
+  overflow: auto;
+  padding: 1rem;
+}
+.singInForm {
+  border: 1px solid #7d91aa;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  h1 {
+    color: black;
+  }
+  h3 {
+    margin-top: 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+.br0 {
+  border-radius: 0;
+}
+.signInButton {
+  background-color: #49627d;
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+}
+.form-control {
+  border-radius: 2px;
+  outline: 0;
+  box-shadow: none;
+  border: 1px solid #bfbfbf;
+
+  &.is-invalid {
+    border: 2px solid #f8000f !important;
+  }
+}
+.awrp {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+  .validationMesage {
+    color: #f8000f;
+    padding: 4px;
+    border: 1px solid #f8000f;
+    border-radius: 4px;
+  }
+}
+.incorectPasswordOrusername {
+  margin: 0;
+  color: #f8000f;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+}
+.forgotPassword {
+  color: #666767;
+  font-size: 14px;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
